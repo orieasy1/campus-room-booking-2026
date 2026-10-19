@@ -105,7 +105,7 @@ class RoomUtilizationServiceTest {
     }
 
     @Test
-    void percentage_roundsDownBelowHalf() {
+    void percentage_roundsUpAboveHalf() {
         // 창 09:00-12:00(180분), 1분 -> 0.5555... -> 0.56
         RoomUsage usage = RoomUtilizationService.summarize(
                 List.of(booking(1, "10:00", "10:01")),
