@@ -121,4 +121,10 @@ class RoomUtilizationServiceTest {
                 ROOM, DATE, LocalTime.of(9, 0), LocalTime.of(22, 20));
         assertUsage(usage, 1, 1, "0.13");
     }
+
+    @Test
+    void zeroLengthBooking_isNotCounted() {
+        // start == end: no minutes inside the window, so it is not counted
+        assertUsage(summarize(List.of(booking(1, "10:00", "10:00"))), 0, 0, "0.00");
+    }
 }
