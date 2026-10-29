@@ -128,6 +128,38 @@ class RoomUtilizationFilterAndValidationTest {
         assertEquals(new BigDecimal("25.00"), usage.getUtilizationPercent()); // 120 / 480
     }
 
+    @Test
+    void bookingStartingOnPreviousDateIsClippedToWindow() {
+        // 2026-10-01 22:00 -> 2026-10-02 10:00, counted only from 09:00 to 10:00
+        List<Booking> bookings = List.of(
+                new Booking(1, "s1", ROOM,
+                        LocalDateTime.of(DATE.minusDays(1), LocalTime.of(22, 0)),
+                        LocalDateTime.of(DATE, LocalTime.of(10, 0)),
+                        2, "Study", BookingStatus.ACTIVE));
+
+        RoomUsage usage = RoomUtilizationService.summarize(bookings, ROOM, DATE, OPEN, CLOSE);
+
+        assertEquals(1, usage.getBookingCount());
+        assertEquals(60L, usage.getBookedMinutes());
+        assertEquals(new BigDecimal("12.50"), usage.getUtilizationPercent());
+    }
+
+    @Test
+    void bookingEndingOnNextDateIsClippedToWindow() {
+        // 2026-10-02 16:00 -> 2026-10-03 01:00, counted only from 16:00 to 17:00
+        List<Booking> bookings = List.of(
+                new Booking(1, "s1", ROOM,
+                        LocalDateTime.of(DATE, LocalTime.of(16, 0)),
+                        LocalDateTime.of(DATE.plusDays(1), LocalTime.of(1, 0)),
+                        2, "Study", BookingStatus.ACTIVE));
+
+        RoomUsage usage = RoomUtilizationService.summarize(bookings, ROOM, DATE, OPEN, CLOSE);
+
+        assertEquals(1, usage.getBookingCount());
+        assertEquals(60L, usage.getBookedMinutes());
+        assertEquals(new BigDecimal("12.50"), usage.getUtilizationPercent());
+    }
+
     // ---------------------------------------------------------------
     // Validation tests (all must throw IllegalArgumentException)
     // ---------------------------------------------------------------
