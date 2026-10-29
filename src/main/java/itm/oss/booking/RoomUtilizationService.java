@@ -17,6 +17,9 @@ public final class RoomUtilizationService {
      * Issue 7: summarizes how much a room is used during its operating
      * window on the given date.
      *
+     * <p>Following docs/ASSUMPTIONS.md, {@code bookings} must be a non-null
+     * list with non-null elements; this method does not validate it.
+     *
      * @throws IllegalArgumentException if roomId is null/blank, any of
      *         date/openTime/closeTime is null, or openTime is not before closeTime
      */
